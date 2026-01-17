@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gamezone_flutter/app/theme/theme.dart';
+import 'package:gamezone_flutter/app/theme/app_theme.dart';
 import '../features/splash/presentation/view/splash_screen.dart';
 import '../features/onboarding/presentation/view/onboarding_screen.dart';
 import '../features/auth/presentation/view/login_screen.dart';
@@ -19,7 +19,7 @@ class App extends StatelessWidget {
         "/register": (context) => const RegisterScreen(),
         '/home': (context) => const HomeScreen(),
       },
-      theme: getApplicationTheme(),
+      theme: AppTheme.lightTheme,
       home: const SplashScreen(),
     );
   }

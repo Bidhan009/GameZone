@@ -3,23 +3,21 @@ import 'package:equatable/equatable.dart';
 // We use Equatable to easily compare two User objects
 class UserEntity extends Equatable {
   final String? id;
-  final String fname;
-  final String lname;
-  final String? image;
-  final String phone;
-  final String username;
-  final String password;
+  final String fullName;
+  final String email;
+  final String? phone;
+  final String? password;
+  final String confirmPassword;
 
   const UserEntity({
     this.id,
-    required this.fname,
-    required this.lname,
-    this.image,
-    required this.phone,
-    required this.username,
-    required this.password,
+    required this.fullName,
+    required this.email,
+    this.phone,
+    this.password,
+    required this.confirmPassword,
   });
 
   @override
-  List<Object?> get props => [id, fname, lname, image, phone, username, password];
+  List<Object?> get props => [id, fullName, email, phone, password, confirmPassword];
 }

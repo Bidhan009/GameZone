@@ -10,43 +10,35 @@ class AuthHiveModel {
   @HiveField(0)
   final String? userId;
   @HiveField(1)
-  final String fname;
+  final String fullName;
   @HiveField(2)
-  final String lname;
+  final String email;
   @HiveField(3)
-  final String phone;
-  @HiveField(4)
-  final String username;
+  final String? phone;
   @HiveField(5)
-  final String password;
+  final String? password;
+  @HiveField(6)
+  final String? confirmPassword;
 
   AuthHiveModel({
     String? userId,
-    required this.fname,
-    required this.lname,
-    required this.phone,
-    required this.username,
+    required this.fullName,
+    required this.email,
+    this.phone,
     required this.password,
+    required this.confirmPassword,
   }) : userId = userId ?? const Uuid().v4();
 
-  // Initial constructor
-  AuthHiveModel.initial()
-      : userId = '',
-        fname = '',
-        lname = '',
-        phone = '',
-        username = '',
-        password = '';
 
   // Convert Entity to Model (To save to Hive)
   factory AuthHiveModel.fromEntity(UserEntity entity) {
     return AuthHiveModel(
       userId: entity.id,
-      fname: entity.fname,
-      lname: entity.lname,
+      fullName: entity.fullName,
+      email: entity.email,
       phone: entity.phone,
-      username: entity.username,
       password: entity.password,
+      confirmPassword: entity.confirmPassword,
     );
   }
 
@@ -54,11 +46,16 @@ class AuthHiveModel {
   UserEntity toEntity() {
     return UserEntity(
       id: userId,
-      fname: fname,
-      lname: lname,
+      fullName: fullName,
+      email: email,
       phone: phone,
-      username: username,
-      password: password,
+      password: password, 
+      confirmPassword: confirmPassword??'',
     );
+  }
+
+  // to entity list
+  static List<UserEntity> toEntityList(List<AuthHiveModel> models){
+    return models.map((model)=> model.toEntity()).toList();
   }
 }
