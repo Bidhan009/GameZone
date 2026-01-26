@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:gamezone_flutter/app/di/di.dart';
-import 'package:gamezone_flutter/features/auth/domain/use_case/login_use_case.dart';
-import 'register_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gamezone_flutter/features/auth/domain/use_case/login_usecase.dart';
+import 'package:gamezone_flutter/features/auth/presentation/view/register_screen.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
 
@@ -47,7 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
               TextField(
                 controller: _usernameController,
                 decoration: InputDecoration(
-                  labelText: "username",
+                  labelText: "email",
                   prefixIcon: const Icon(Icons.person),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -82,16 +82,19 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   onPressed: () async {
-                    // 1. Get the UseCase from the Locator
-                    final loginUseCase = locator<LoginUseCase>();
+                    // Get the UseCase from the provider
+                    final loginUsecase = ref.read(loginUsecaseProvider);
 
-                    // 2. Call the logic
-                    final result = await loginUseCase.call(
-                      _usernameController.text,
-                      _passwordController.text,
+                    // Create params
+                    final params = LoginUsecaseParams(
+                      email: _usernameController.text,
+                      password: _passwordController.text,
                     );
 
-                    // 3. Handle the result
+                    // Call the usecase
+                    final result = await loginUsecase(params);
+
+                    // Handle the result
                     result.fold(
                       (failure) {
                         // Show error message
@@ -99,7 +102,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           SnackBar(content: Text(failure.message)),
                         );
                       },
-                      (_) {
+                      (user) {
                         // Navigate to Home
                         Future.microtask(() {
                           Navigator.pushReplacementNamed(context, '/home');
