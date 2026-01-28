@@ -1,6 +1,6 @@
 import 'package:gamezone_flutter/features/auth/presentation/view/login_screen.dart';
 import 'package:gamezone_flutter/features/auth/presentation/view/register_screen.dart';
-import 'package:gamezone_flutter/features/home/presentation/view/home_screen.dart';
+import 'package:gamezone_flutter/features/Dashboard/presentation/view/home_screen.dart';
 import 'package:gamezone_flutter/features/splash/presentation/view/splash_screen.dart';
 
 class AppRoutes {

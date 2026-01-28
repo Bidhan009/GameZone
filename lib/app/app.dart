@@ -4,7 +4,7 @@ import '../features/splash/presentation/view/splash_screen.dart';
 import '../features/onboarding/presentation/view/onboarding_screen.dart';
 import '../features/auth/presentation/view/login_screen.dart';
 import '../features/auth/presentation/view/register_screen.dart';
-import '../features/home/presentation/view/home_screen.dart';
+import '../features/Dashboard/presentation/view/home_screen.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
