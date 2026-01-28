@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:gamezone_flutter/features/Dashboard/presentation/view/bottom_view/about_bottom_screen.dart';
-import 'package:gamezone_flutter/features/Dashboard/presentation/view/bottom_view/cart_bottom_screen.dart';
-import 'package:gamezone_flutter/features/Dashboard/presentation/view/bottom_view/profile_bottom_screen.dart';
+import 'package:gamezone_flutter/features/Dashboard/presentation/view/bookmark_screen.dart';
+import 'package:gamezone_flutter/features/Dashboard/presentation/view/cart_screen.dart';
+import 'package:gamezone_flutter/features/Dashboard/presentation/view/profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -66,11 +66,11 @@ class _HomeScreenState extends State<HomeScreen> {
       case 0:
         return _homeBody();
       case 1:
-        return const CartBottomScreen();
+        return const CartScreen();
       case 2:
-        return const AboutScreen();
+        return const BookmarkScreen();
       case 3:
-        return const ProfileBottomScreen();
+        return const ProfileScreen();
       default:
         return _homeBody();
     }
