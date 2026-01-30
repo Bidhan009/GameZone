@@ -6,7 +6,9 @@ class ProfileHeader extends StatelessWidget {
   final String username;
   final String email;
   final String? avatarPath;
+  final String? avatarUrl;
   final bool isLoading;
+  final bool isUploading;
   final VoidCallback onAvatarTap;
 
   const ProfileHeader({
@@ -14,7 +16,9 @@ class ProfileHeader extends StatelessWidget {
     required this.username,
     required this.email,
     this.avatarPath,
+    this.avatarUrl,
     this.isLoading = false,
+    this.isUploading = false,
     required this.onAvatarTap,
   });
 
@@ -24,7 +28,9 @@ class ProfileHeader extends StatelessWidget {
       children: [
         ProfileAvatar(
           avatarPath: avatarPath,
+          avatarUrl: avatarUrl,
           isLoading: isLoading,
+          isUploading: isUploading,
           onTap: onAvatarTap,
         ),
         const SizedBox(height: 16),
