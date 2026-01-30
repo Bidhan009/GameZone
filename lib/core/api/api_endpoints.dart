@@ -14,7 +14,9 @@ class ApiEndpoints {
   // These match your backend routes exactly
   static const String login = '/auth/login';
   static const String register = '/auth/register';
+  static const String logout = '/auth/logout';
 
-  // Optional: Add profile endpoints if needed later
+  // Profile endpoints
   static const String userProfile = '/auth/profile';
+  static const String profileUpload = '/auth/profile/upload';
 }

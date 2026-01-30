@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 
 // Temporary – later read from auth provider or shared_preferences
 final profileUsernameProvider = StateProvider<String>((ref) => 'Bidhan');

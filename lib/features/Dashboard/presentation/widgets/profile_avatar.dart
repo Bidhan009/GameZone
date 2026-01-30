@@ -1,9 +1,18 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 class ProfileAvatar extends StatelessWidget {
+  final String? avatarPath;
+  final bool isLoading;
   final VoidCallback onTap;
 
-  const ProfileAvatar({super.key, required this.onTap});
+  const ProfileAvatar({
+    super.key,
+    this.avatarPath,
+    this.isLoading = false,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -14,9 +23,17 @@ class ProfileAvatar extends StatelessWidget {
           CircleAvatar(
             radius: 50,
             backgroundColor: const Color(0xFF1E293B),
-            child: const Icon(Icons.person, size: 60, color: Colors.white70),
-            // later → backgroundImage: NetworkImage or AssetImage
+            backgroundImage: avatarPath != null
+                ? FileImage(File(avatarPath!))
+                : null,
+            child: avatarPath == null
+                ? const Icon(Icons.person, size: 60, color: Colors.white70)
+                : null,
           ),
+          if (isLoading)
+            const Positioned.fill(
+              child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+            ),
           Positioned(
             bottom: 4,
             right: 4,
