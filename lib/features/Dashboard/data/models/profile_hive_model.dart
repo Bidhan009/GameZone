@@ -1,5 +1,4 @@
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 import '../../domain/entities/profile_entity.dart';
 
