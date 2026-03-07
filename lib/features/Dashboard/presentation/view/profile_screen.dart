@@ -2,12 +2,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gamezone_flutter/features/Order/presentation/views/order_history_screen.dart';
-
-import '../../../../../core/utils/snackbar_utils.dart';
-import '../../../../../core/utils/image_picker_helper.dart';
+import 'package:gamezone_flutter/core/utils/snackbar_utils.dart';
+import 'package:gamezone_flutter/core/utils/image_picker_helper.dart';
 import '../providers/profile_provider.dart';
-import '../widgets/profile_header.dart';
-import '../widgets/profile_menu_item.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -17,12 +14,11 @@ class ProfileScreen extends ConsumerStatefulWidget {
 }
 
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
-  File? _tempImageFile; // Temporary file for immediate display
+  File? _tempImageFile;
 
   @override
   void initState() {
     super.initState();
-    // Load profile when screen initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(profileProvider.notifier).loadProfile();
     });
@@ -30,7 +26,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   @override
   void dispose() {
-    _tempImageFile = null; // Clean up temporary file
+    _tempImageFile = null;
     super.dispose();
   }
 
@@ -40,60 +36,51 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final profileNotifier = ref.read(profileProvider.notifier);
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(title: const Text('Profile'), centerTitle: true),
+      backgroundColor: const Color(0xFF0F172A),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: const Text(
+          'Profile',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           child: Column(
             children: [
-              // Loading indicator
               if (profileState.isLoading)
-                const Center(child: CircularProgressIndicator())
+                const Padding(
+                  padding: EdgeInsets.all(40),
+                  child: CircularProgressIndicator(color: Color(0xFF6C63FF)),
+                )
               else
-                // Avatar + name + email section
-                ProfileHeader(
-                  username: profileState.profile?.fullName ?? 'Loading...',
-                  email: profileState.profile?.email ?? 'Loading...',
-                  avatarUrl: profileState.profile?.profileImage,
-                  avatarPath: _tempImageFile?.path, // Show temporary image
-                  isUploading: profileState.isUploading,
-                  onAvatarTap: () => _pickAndUploadImage(profileNotifier),
-                ),
+                _buildProfileHeader(profileState, profileNotifier),
 
-              const SizedBox(height: 40),
+              const SizedBox(height: 32),
 
-              // Test button for debugging
-              ElevatedButton(
-                onPressed: () {
-                  print('Current temp image: ${_tempImageFile?.path}');
-                  print(
-                    'Current profile image URL: ${profileState.profile?.profileImage}',
-                  );
-                },
-                child: null,
-              ),
-
-              const SizedBox(height: 20),
-
-              // Error message
               if (profileState.error != null) ...[
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.red.shade50,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.red.shade200),
+                    color: Colors.red.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.error, color: Colors.red.shade600, size: 20),
+                      const Icon(Icons.error, color: Colors.red, size: 20),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           profileState.error!,
-                          style: TextStyle(
-                            color: Colors.red.shade600,
+                          style: const TextStyle(
+                            color: Colors.red,
                             fontSize: 14,
                           ),
                         ),
@@ -101,16 +88,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       IconButton(
                         icon: const Icon(Icons.close, size: 16),
                         onPressed: () => profileNotifier.clearError(),
-                        color: Colors.red.shade600,
+                        color: Colors.red,
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 24),
               ],
 
-              // Menu items
-              ProfileMenuItem(
+              _buildMenuItem(
                 icon: Icons.person_outline_rounded,
                 title: 'Edit Profile',
                 onTap: () => _showEditProfileDialog(
@@ -121,9 +107,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ),
               const SizedBox(height: 12),
 
-              ProfileMenuItem(
+              _buildMenuItem(
                 icon: Icons.history_rounded,
-                title: 'Order History / Purchases',
+                title: 'Order History',
                 onTap: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
@@ -134,19 +120,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ),
               const SizedBox(height: 12),
 
-              ProfileMenuItem(
+              _buildMenuItem(
                 icon: Icons.settings_rounded,
                 title: 'Settings',
-                onTap: () {
-                  // TODO: settings screen
-                },
+                onTap: () {},
               ),
               const SizedBox(height: 12),
 
-              // Delete profile image option (only if image exists)
               if (profileState.profile?.profileImage != null &&
                   profileState.profile!.profileImage!.isNotEmpty) ...[
-                ProfileMenuItem(
+                _buildMenuItem(
                   icon: Icons.delete_outline_rounded,
                   title: 'Remove Profile Picture',
                   isDestructive: true,
@@ -155,12 +138,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 const SizedBox(height: 12),
               ],
 
-              ProfileMenuItem(
+              _buildMenuItem(
                 icon: Icons.logout_rounded,
                 title: 'Logout',
                 isDestructive: true,
                 onTap: () => _showLogoutDialog(context, profileNotifier),
               ),
+              const SizedBox(height: 40),
             ],
           ),
         ),
@@ -168,34 +152,181 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
+  Widget _buildProfileHeader(ProfileState state, ProfileNotifier notifier) {
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: () => _pickAndUploadImage(notifier),
+          child: Stack(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF6C63FF), Color(0xFF9D4EDD)],
+                  ),
+                ),
+                child: CircleAvatar(
+                  radius: 60,
+                  backgroundColor: const Color(0xFF1E293B),
+                  backgroundImage: state.profile?.profileImage != null
+                      ? NetworkImage(state.profile!.profileImage!)
+                      : null,
+                  child: _tempImageFile != null
+                      ? ClipOval(
+                          child: Image.file(
+                            _tempImageFile!,
+                            fit: BoxFit.cover,
+                            width: 120,
+                            height: 120,
+                          ),
+                        )
+                      : state.profile?.profileImage == null
+                          ? Icon(
+                              Icons.person,
+                              size: 50,
+                              color: Colors.white.withValues(alpha: 0.5),
+                            )
+                          : null,
+                ),
+              ),
+              Positioned(
+                bottom: 0,
+                right: 0,
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF6C63FF),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: const Color(0xFF0F172A), width: 3),
+                  ),
+                  child: const Icon(
+                    Icons.camera_alt,
+                    color: Colors.white,
+                    size: 18,
+                  ),
+                ),
+              ),
+              if (state.isUploading)
+                Positioned.fill(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.5),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Center(
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          state.profile?.fullName ?? 'Guest User',
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          state.profile?.email ?? 'No email available',
+          style: TextStyle(
+            color: Colors.white.withValues(alpha: 0.6),
+            fontSize: 14,
+          ),
+        ),
+        if (state.profile?.phone != null && state.profile!.phone!.isNotEmpty) ...[
+          const SizedBox(height: 4),
+          Text(
+            state.profile!.phone!,
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.6),
+              fontSize: 14,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildMenuItem({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+    bool isDestructive = false,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1E293B),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.1),
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: isDestructive
+                    ? Colors.red.withValues(alpha: 0.2)
+                    : const Color(0xFF6C63FF).withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                icon,
+                color: isDestructive ? Colors.red : const Color(0xFF6C63FF),
+                size: 22,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  color: isDestructive ? Colors.red : Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios,
+              color: Colors.white.withValues(alpha: 0.3),
+              size: 18,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Future<void> _pickAndUploadImage(ProfileNotifier profileNotifier) async {
     try {
-      print('Starting image pick process...'); // Debug log
-
-      // First, let's try a direct gallery pick without the dialog
       final File? imageFile = await ImagePickerHelper.pickFromGallery(
         maxWidth: 1024,
         maxHeight: 1024,
         imageQuality: 85,
       );
 
-      print('Image file picked: ${imageFile?.path}'); // Debug log
-
       if (imageFile != null) {
-        print('Setting temporary image...'); // Debug log
-
-        // Show the picked image immediately
         setState(() {
           _tempImageFile = imageFile;
         });
 
-        print('Starting upload...'); // Debug log
-
         final success = await profileNotifier.uploadProfileImage(imageFile);
 
-        print('Upload completed, success: $success'); // Debug log
-
-        // Clear temporary image after upload completes
         setState(() {
           _tempImageFile = null;
         });
@@ -210,13 +341,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             SnackbarUtils.showError(context, 'Failed to upload image');
           }
         }
-      } else {
-        print('No image file selected'); // Debug log
       }
     } catch (e) {
-      print('Error in image pick/upload: $e'); // Debug log
-
-      // Clear temporary image on error
       setState(() {
         _tempImageFile = null;
       });
@@ -232,47 +358,43 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     ProfileNotifier notifier,
     profile,
   ) {
-    final fullNameController = TextEditingController(
-      text: profile?.fullName ?? '',
-    );
+    final fullNameController = TextEditingController(text: profile?.fullName ?? '');
     final emailController = TextEditingController(text: profile?.email ?? '');
     final phoneController = TextEditingController(text: profile?.phone ?? '');
 
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
+        backgroundColor: const Color(0xFF1E293B),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Text(
           'Edit Profile',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(
+              _buildTextField(
                 controller: fullNameController,
-                decoration: const InputDecoration(
-                  labelText: 'Full Name',
-                  border: OutlineInputBorder(),
-                ),
+                label: 'Full Name',
+                icon: Icons.person_outline,
               ),
               const SizedBox(height: 16),
-              TextField(
+              _buildTextField(
                 controller: emailController,
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                  border: OutlineInputBorder(),
-                ),
+                label: 'Email',
+                icon: Icons.email_outlined,
                 keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: 16),
-              TextField(
+              _buildTextField(
                 controller: phoneController,
-                decoration: const InputDecoration(
-                  labelText: 'Phone',
-                  border: OutlineInputBorder(),
-                ),
+                label: 'Phone',
+                icon: Icons.phone_outlined,
                 keyboardType: TextInputType.phone,
               ),
             ],
@@ -281,12 +403,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: Colors.white70),
+            ),
           ),
-          TextButton(
+          ElevatedButton(
             onPressed: () async {
               Navigator.pop(dialogContext);
-
               final success = await notifier.updateProfile(
                 fullName: fullNameController.text.trim(),
                 email: emailController.text.trim(),
@@ -295,18 +419,50 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
               if (mounted) {
                 if (success) {
-                  SnackbarUtils.showSuccess(
-                    context,
-                    'Profile updated successfully!',
-                  );
+                  SnackbarUtils.showSuccess(context, 'Profile updated successfully!');
                 } else {
                   SnackbarUtils.showError(context, 'Failed to update profile');
                 }
               }
             },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF6C63FF),
+            ),
             child: const Text('Save'),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    TextInputType? keyboardType,
+  }) {
+    return TextField(
+      controller: controller,
+      keyboardType: keyboardType,
+      style: const TextStyle(color: Colors.white),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+        prefixIcon: Icon(icon, color: Colors.white.withValues(alpha: 0.7)),
+        filled: true,
+        fillColor: Colors.white.withValues(alpha: 0.05),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFF6C63FF), width: 2),
+        ),
       ),
     );
   }
@@ -315,37 +471,41 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
+        backgroundColor: const Color(0xFF1E293B),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Text(
           'Remove Profile Picture',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         content: const Text(
           'Are you sure you want to remove your profile picture?',
+          style: TextStyle(color: Colors.white70),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: Colors.white70),
+            ),
           ),
-          TextButton(
+          ElevatedButton(
             onPressed: () async {
               Navigator.pop(dialogContext);
-
               final success = await notifier.deleteProfileImage();
 
               if (mounted) {
                 if (success) {
-                  SnackbarUtils.showSuccess(
-                    context,
-                    'Profile picture removed successfully!',
-                  );
+                  SnackbarUtils.showSuccess(context, 'Profile picture removed successfully!');
                 } else {
                   SnackbarUtils.showError(context, 'Failed to remove picture');
                 }
               }
             },
-            child: const Text('Remove', style: TextStyle(color: Colors.red)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+            ),
+            child: const Text('Remove'),
           ),
         ],
       ),
@@ -356,32 +516,31 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
+        backgroundColor: const Color(0xFF1E293B),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Text(
           'Logout',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
-        content: const Text('Are you sure you want to leave GameZone?'),
+        content: const Text(
+          'Are you sure you want to leave GameZone?',
+          style: TextStyle(color: Colors.white70),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text(
+            child: const Text(
               'Cancel',
-              style: TextStyle(
-                color: Theme.of(context).textTheme.bodyMedium?.color,
-              ),
+              style: TextStyle(color: Colors.white70),
             ),
           ),
-          TextButton(
+          ElevatedButton(
             onPressed: () async {
               Navigator.pop(dialogContext);
-
               await notifier.logout();
 
               if (mounted) {
                 SnackbarUtils.showSuccess(context, 'Logged out successfully');
-
-                // Navigate to login screen
                 Navigator.pushNamedAndRemoveUntil(
                   context,
                   '/login',
@@ -389,13 +548,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 );
               }
             },
-            child: const Text(
-              'Logout',
-              style: TextStyle(
-                color: Colors.redAccent,
-                fontWeight: FontWeight.bold,
-              ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
             ),
+            child: const Text('Logout'),
           ),
         ],
       ),
