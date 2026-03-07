@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gamezone_flutter/features/Dashboard/presentation/view/bookmark_screen.dart';
 import 'package:gamezone_flutter/features/Dashboard/presentation/view/cart_screen.dart';
 import 'package:gamezone_flutter/features/Dashboard/presentation/view/profile_screen.dart';
+import 'package:gamezone_flutter/features/Dashboard/presentation/view/product_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -52,6 +53,10 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'Cart',
           ),
           BottomNavigationBarItem(
+            icon: Icon(Icons.apps),
+            label: 'Products',
+          ),
+          BottomNavigationBarItem(
             icon: Icon(Icons.bookmark),
             label: 'Bookmarks',
           ),
@@ -68,8 +73,10 @@ class _HomeScreenState extends State<HomeScreen> {
       case 1:
         return const CartScreen();
       case 2:
-        return const BookmarkScreen();
+        return const ProductScreen();
       case 3:
+        return const BookmarkScreen();
+      case 4:
         return const ProfileScreen();
       default:
         return _homeBody();
