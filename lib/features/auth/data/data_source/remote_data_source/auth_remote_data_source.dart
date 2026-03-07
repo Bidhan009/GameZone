@@ -1,26 +1,38 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gamezone_flutter/core/api/api_client.dart';
 import 'package:gamezone_flutter/core/api/api_endpoints.dart';
+import 'package:gamezone_flutter/core/service/storage/token_service.dart';
 import 'package:gamezone_flutter/core/service/storage/user_session_service.dart';
 import 'package:gamezone_flutter/features/auth/data/data_source/auth_datasource.dart';
 import 'package:gamezone_flutter/features/auth/data/model/auth_api_model.dart';
 
+// Create provider
 final authRemoteDatasourceProvider = Provider<IAuthRemoteDataSource>((ref) {
   return AuthRemoteDatasource(
     apiClient: ref.read(apiClientProvider),
     userSessionService: ref.read(userSessionServiceProvider),
+    tokenService: ref.read(tokenServiceProvider),
   );
 });
 
 class AuthRemoteDatasource implements IAuthRemoteDataSource {
   final ApiClient _apiClient;
   final UserSessionService _userSessionService;
+  final TokenService _tokenService;
 
   AuthRemoteDatasource({
     required ApiClient apiClient,
     required UserSessionService userSessionService,
+    required TokenService tokenService,
   }) : _apiClient = apiClient,
-       _userSessionService = userSessionService;
+       _userSessionService = userSessionService,
+       _tokenService = tokenService;
+
+  @override
+  Future<AuthApiModel?> getUserById(String authId) {
+    // TODO: implement getUserById
+    throw UnimplementedError();
+  }
 
   @override
   Future<AuthApiModel?> login(String email, String password) async {
@@ -29,24 +41,33 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
       data: {'email': email, 'password': password},
     );
 
+    // Check success
     if (response.data['success'] == true) {
-  final data = response.data['data'] as Map<String, dynamic>;
-  final user = AuthApiModel.fromJson(data);
+      final data = response.data['data'] as Map<String, dynamic>;
+      final user = AuthApiModel.fromJson(data);
 
-  // Save to session using YOUR model's fields
-  await _userSessionService.saveUserSession(
-    // Use ?? '' instead of ! to prevent the "null check" crash
-    userId: user.authId ?? '', 
-    email: user.email,
-    fullName: user.fullName,
-    // Add other fields only if your UserSessionService supports them
-    phone: user.phone ?? '', 
-  );
-  
-  return user;
-}
+      // ✅ Extract token safely
+      final token = response.data['token'] as String?;
 
-    return null;
+      if (token == null || token.isEmpty) {
+        throw Exception("Token not found in response");
+      }
+
+      // ✅ Save token to secure storage
+      await _tokenService.saveToken(token);
+
+      // ✅ Save user session
+      await _userSessionService.saveUserSession(
+        userId: user.authId ?? '',
+        email: user.email,
+        fullName: user.fullName,
+        phone: user.phone ?? '',
+      );
+
+      return user;
+    }
+
+    throw Exception(response.data['message'] ?? "Login failed");
   }
 
   @override
@@ -63,11 +84,5 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
     }
 
     return user;
-  }
-
-  @override
-  Future<AuthApiModel?> getUserById(String authId) {
-    // TODO: implement getUserById
-    throw UnimplementedError();
   }
 }

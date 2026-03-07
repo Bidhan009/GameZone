@@ -119,7 +119,22 @@ class ApiClient {
     );
   }
 
-  // Multipart request for file uploads
+  // PATCH request
+  Future<Response> patch(
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  }) async {
+    return _dio.patch(
+      path,
+      data: data,
+      queryParameters: queryParameters,
+      options: options,
+    );
+  }
+
+  // Multipart request for file uploads (POST)
   Future<Response> uploadFile(
     String path, {
     required FormData formData,
@@ -127,6 +142,21 @@ class ApiClient {
     ProgressCallback? onSendProgress,
   }) async {
     return _dio.post(
+      path,
+      data: formData,
+      options: options,
+      onSendProgress: onSendProgress,
+    );
+  }
+
+  // Multipart request for file uploads (PUT)
+  Future<Response> uploadFilePut(
+    String path, {
+    required FormData formData,
+    Options? options,
+    ProgressCallback? onSendProgress,
+  }) async {
+    return _dio.put(
       path,
       data: formData,
       options: options,

@@ -25,3 +25,8 @@ class ApiFailure extends Failure {
   @override
   List<Object?> get props => [message, statusCode];
 }
+
+//Network failure
+class NetworkFailure extends Failure {
+  const NetworkFailure({required String message}) : super(message);
+}

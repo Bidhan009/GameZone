@@ -2,11 +2,11 @@ class ApiEndpoints {
   ApiEndpoints._();
 
   // Choose based on your testing device
-  static const String _emulator = '10.0.2.2'; // Android Emulator
-  // static const String _physical = '192.168.137.1'; // Update this to your IP!
+  // static const String _emulator = '10.0.2.2'; // Android Emulator
+  static const String _physical = '10.34.169.183'; // Update this to your IP!
 
   // Backend runs on port 5050 (from your server output)
-  static const String baseUrl = 'http://$_emulator:5000/api/';
+  static const String baseUrl = 'http://$_physical:5000/api/';
 
   static const Duration connectionTimeout = Duration(seconds: 30);
   static const Duration receiveTimeout = Duration(seconds: 30);
@@ -14,7 +14,17 @@ class ApiEndpoints {
   // These match your backend routes exactly
   static const String login = '/auth/login';
   static const String register = '/auth/register';
+  static const String logout = '/auth/logout';
 
-  // Optional: Add profile endpoints if needed later
-  static const String userProfile = '/auth/profile';
+  // Profile endpoints (matches backend: /auth/whoami and /auth/update-profile)
+  static const String userProfile = '/auth/whoami';
+  static const String updateProfile = '/auth/update-profile';
+
+  static const String products = '/products';
+  static String productById(String id) => '/products/$id';
+  // Cart
+  static const String cart = '/cart';
+
+  // Orders
+  static const String orders = '/orders';
 }
