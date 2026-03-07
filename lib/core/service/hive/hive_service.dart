@@ -38,6 +38,7 @@ class HiveService {
   Future<void> _openBoxes() async {
     await Hive.openBox<AuthHiveModel>(HiveTableConstant.authTable);
     await Hive.openBox<ProfileHiveModel>(HiveTableConstant.profileTable);
+    await Hive.openBox(HiveTableConstant.bookmarkBox);
   }
 
   // Helper getter for Auth Box

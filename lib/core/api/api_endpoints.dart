@@ -3,7 +3,7 @@ class ApiEndpoints {
 
   // Choose based on your testing device
   // static const String _emulator = '10.0.2.2'; // Android Emulator
-  static const String _physical = '192.168.101.20'; // Update this to your IP!
+  static const String _physical = '10.34.169.183'; // Update this to your IP!
 
   // Backend runs on port 5050 (from your server output)
   static const String baseUrl = 'http://$_physical:5000/api/';
@@ -24,4 +24,7 @@ class ApiEndpoints {
   static String productById(String id) => '/products/$id';
   // Cart
   static const String cart = '/cart';
+
+  // Orders
+  static const String orders = '/orders';
 }

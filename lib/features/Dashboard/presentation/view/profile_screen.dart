@@ -1,12 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:gamezone_flutter/features/Order/presentation/views/order_history_screen.dart';
 
 import '../../../../../core/utils/snackbar_utils.dart';
 import '../../../../../core/utils/image_picker_helper.dart';
 import '../providers/profile_provider.dart';
-import '../widgets/profile_avatar.dart';
 import '../widgets/profile_header.dart';
 import '../widgets/profile_menu_item.dart';
 
@@ -126,7 +125,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 icon: Icons.history_rounded,
                 title: 'Order History / Purchases',
                 onTap: () {
-                  // TODO: navigate to orders screen
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const OrderHistoryScreen(),
+                    ),
+                  );
                 },
               ),
               const SizedBox(height: 12),
@@ -204,10 +207,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               'Profile picture updated successfully!',
             );
           } else {
-            SnackbarUtils.showError(
-              context,
-              profileNotifier.state.error ?? 'Failed to upload image',
-            );
+            SnackbarUtils.showError(context, 'Failed to upload image');
           }
         }
       } else {
@@ -300,10 +300,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     'Profile updated successfully!',
                   );
                 } else {
-                  SnackbarUtils.showError(
-                    context,
-                    notifier.state.error ?? 'Failed to update profile',
-                  );
+                  SnackbarUtils.showError(context, 'Failed to update profile');
                 }
               }
             },
@@ -344,10 +341,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     'Profile picture removed successfully!',
                   );
                 } else {
-                  SnackbarUtils.showError(
-                    context,
-                    notifier.state.error ?? 'Failed to remove picture',
-                  );
+                  SnackbarUtils.showError(context, 'Failed to remove picture');
                 }
               }
             },

@@ -27,8 +27,10 @@ class ProductApiModel {
   }
 
   factory ProductApiModel.fromJson(Map<String, dynamic> json) {
+    final productId = json['_id']?.toString() ?? json['id']?.toString() ?? '';
+    print('ProductApiModel.fromJson: _id=$productId, name=${json['name']}');
     return ProductApiModel(
-      id: json['_id'] ?? json['id'] ?? '',
+      id: productId,
       name: json['name'] ?? '',
       price: (json['price'] is String) 
           ? double.parse(json['price']) 
