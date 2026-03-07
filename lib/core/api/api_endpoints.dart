@@ -16,7 +16,7 @@ class ApiEndpoints {
   static const String register = '/auth/register';
   static const String logout = '/auth/logout';
 
-  // Profile endpoints
-  static const String userProfile = '/auth/profile';
-  static const String profileUpload = '/auth/profile/upload';
+  // Profile endpoints (matches backend: /auth/whoami and /auth/update-profile)
+  static const String userProfile = '/auth/whoami';
+  static const String updateProfile = '/auth/update-profile';
 }

@@ -46,7 +46,7 @@ class ProfileRemoteDataSource implements IProfileRemoteDataSource {
   Future<ProfileApiModel> updateProfile(ProfileApiModel profile) async {
     try {
       final response = await _apiClient.put(
-        ApiEndpoints.userProfile,
+        ApiEndpoints.updateProfile,
         data: profile.toJson(),
       );
 
@@ -71,8 +71,8 @@ class ProfileRemoteDataSource implements IProfileRemoteDataSource {
         ),
       });
 
-      final response = await _apiClient.uploadFile(
-        ApiEndpoints.profileUpload,
+      final response = await _apiClient.uploadFilePut(
+        ApiEndpoints.updateProfile,
         formData: formData,
       );
 
